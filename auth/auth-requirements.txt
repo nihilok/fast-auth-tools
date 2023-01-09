@@ -1,0 +1,5 @@
+aiosqlite
+python-jose
+python-multipart
+passlib
+bcrypt
