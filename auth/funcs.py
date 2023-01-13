@@ -1,8 +1,7 @@
-import time
 from datetime import timedelta, datetime
 
 import aiosqlite
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
@@ -39,9 +38,10 @@ async def replace(model, values: dict, db_path=USER_DB):
         await db.commit()
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict, expires_delta=None):
     to_encode = data.copy()
-    expires_delta = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    if expires_delta is None:
+        expires_delta = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -49,25 +49,22 @@ def create_access_token(data: dict):
 
 
 def decode_jwt(token: str) -> dict:
-    try:
-        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return decoded_token if decoded_token["expires"] >= time.time() else None
-    except Exception:
-        return {"message": "token expired, please log in again"}
+    decoded_token = jwt.decode(
+        token, SECRET_KEY, algorithms=[ALGORITHM], options={"require_sub": True}
+    )
+    return decoded_token
 
 
 async def get_data_from_token(token: str = Depends(oauth2_scheme)) -> TokenData:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
+        payload = decode_jwt(token)
+        token_data = TokenData(username=payload["sub"])
+        return token_data
     except JWTError:
         raise credentials_exception
-    return token_data
 
 
 def run(coroutine):
     import asyncio
+
     return asyncio.run(coroutine)

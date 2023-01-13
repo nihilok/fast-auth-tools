@@ -1,0 +1,9 @@
+aiosqlite>=0.18.0
+fastapi>=0.89.0
+pydantic>=1.10.4
+passlib>=1.7.4
+starlette>=0.22.0
+bcrypt>=4.0.1
+python-jose>=3.3.0
+python-multipart>=0.0.5
+uvicorn>=0.20.0

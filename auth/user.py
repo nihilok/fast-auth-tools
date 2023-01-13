@@ -25,6 +25,7 @@ class User(BaseModel):
 
     @classmethod
     async def get(cls, username):
+        username = username.split(" ")[0]
         async with aiosqlite.connect(USER_DB) as db:
             async with db.execute(
                 f"SELECT * FROM users WHERE username = '{username}'"
@@ -64,7 +65,7 @@ class User(BaseModel):
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     data = await get_data_from_token(token)
-    user = User.get(username=data.username)
+    user = await User.get(username=data.username)
     if user is None:
         raise credentials_exception
     return user
