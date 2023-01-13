@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 
 import aiosqlite
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
@@ -26,11 +26,21 @@ def verify_password(password, hash):
     return pwd_context.verify(password, hash)
 
 
-async def replace(model, values: dict, db_path=USER_DB):
-    table = model.__table__
+async def replace(table, values: dict, db_path=USER_DB):
     values = values.items()
     stmt = f"""
     REPLACE INTO {table} ({', '.join((v[0] for v in values))})
+    VALUES ({', '.join(("'" + v[1] + "'" for v in values))});
+    """
+    async with aiosqlite.connect(db_path) as db:
+        await db.execute(stmt)
+        await db.commit()
+
+
+async def insert(table, values: dict, db_path=USER_DB):
+    values = values.items()
+    stmt = f"""
+    INSERT INTO {table} ({', '.join((v[0] for v in values))})
     VALUES ({', '.join(("'" + v[1] + "'" for v in values))});
     """
     async with aiosqlite.connect(db_path) as db:

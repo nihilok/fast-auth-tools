@@ -6,7 +6,7 @@ from pydantic import BaseModel, constr, ValidationError
 
 from .constants import USER_DB, oauth2_scheme
 from .exceptions import credentials_exception
-from .funcs import replace, get_data_from_token
+from .funcs import replace, get_data_from_token, insert
 from .funcs import get_password_hash as _hash
 from .funcs import verify_password as _verify
 
@@ -38,12 +38,14 @@ class User(BaseModel):
     async def save(self):
         if len(self.password) != 60:
             self.password = self.hash_password(self.password)
-        await replace(User, {"username": self.username, "password": self.password})
+        await replace(
+            self.__table__, {"username": self.username, "password": self.password}
+        )
 
     @classmethod
     async def create(cls, username: str, password: constr(max_length=59)):
         password = cls.hash_password(password)
-        await replace(User, {"username": username, "password": password})
+        await insert(cls.__table__, {"username": username, "password": password})
         return cls(username=username, password=password)
 
     async def update_password(self, old_password, password: constr(max_length=59)):
@@ -69,5 +71,3 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
-
-
