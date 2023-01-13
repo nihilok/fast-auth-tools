@@ -9,5 +9,9 @@ async def create_user(username, password):
     print(f"{username} user created")
 
 
-if __name__ == "__main__":
+def run_create_user():
     run(create_user(input("username: "), getpass("password: ")))
+
+
+if __name__ == "__main__":
+    run_create_user()
