@@ -1,9 +1,7 @@
 import sqlite3
-from getpass import getpass
 
-from auth.create_user import create_user, run_create_user
-from auth.funcs import run
-from constants import USER_DB
+from auth.create_user import run_create_user
+from settings import settings
 
 
 def create_user_table():
@@ -12,7 +10,7 @@ def create_user_table():
         password text NOT NULL
     );"""
 
-    db = sqlite3.connect(USER_DB)
+    db = sqlite3.connect(settings.user_db_path)
     cursor = db.cursor()
     cursor.execute(SQL)
     db.commit()

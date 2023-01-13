@@ -5,13 +5,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from .funcs import (
     create_access_token,
 )
+from .settings import settings
 from .user import User, get_current_user
 from .token import Token
 
 router = APIRouter()
 
 
-@router.post("/token/", response_model=Token)
+@router.post(f"/{settings.login_url}/", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Token:
@@ -25,8 +26,8 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.get("/check_token/")
-async def check_token(
+@router.get(f"/{settings.token_refresh_url}/")
+async def refresh_token(
     user: User = Depends(get_current_user),
 ):
     access_token = create_access_token(data={"sub": user.username})

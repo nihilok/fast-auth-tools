@@ -6,12 +6,9 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from .constants import (
-    ACCESS_TOKEN_EXPIRE_DAYS,
-    SECRET_KEY,
-    ALGORITHM,
-    USER_DB,
     oauth2_scheme,
 )
+from .settings import settings
 from .token import TokenData
 from .exceptions import credentials_exception
 
@@ -26,7 +23,7 @@ def verify_password(password, hash):
     return pwd_context.verify(password, hash)
 
 
-async def replace(table, values: dict, db_path=USER_DB):
+async def replace(table, values: dict, db_path=settings.user_db_path):
     values = values.items()
     stmt = f"""
     REPLACE INTO {table} ({', '.join((v[0] for v in values))})
@@ -37,7 +34,7 @@ async def replace(table, values: dict, db_path=USER_DB):
         await db.commit()
 
 
-async def insert(table, values: dict, db_path=USER_DB):
+async def insert(table, values: dict, db_path=settings.user_db_path):
     values = values.items()
     stmt = f"""
     INSERT INTO {table} ({', '.join((v[0] for v in values))})
@@ -51,16 +48,23 @@ async def insert(table, values: dict, db_path=USER_DB):
 def create_access_token(data: dict, expires_delta=None):
     to_encode = data.copy()
     if expires_delta is None:
-        expires_delta = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+        expires_delta = timedelta(days=settings.access_token_expire_days)
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.secret_key,
+        algorithm=settings.algorithm,
+    )
     return encoded_jwt
 
 
 def decode_jwt(token: str) -> dict:
     decoded_token = jwt.decode(
-        token, SECRET_KEY, algorithms=[ALGORITHM], options={"require_sub": True}
+        token,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+        options={"require_sub": True},
     )
     return decoded_token
 

@@ -4,11 +4,12 @@ import aiosqlite
 from fastapi import Depends
 from pydantic import BaseModel, constr, ValidationError
 
-from .constants import USER_DB, oauth2_scheme
+from .constants import oauth2_scheme
 from .exceptions import credentials_exception
 from .funcs import replace, get_data_from_token, insert
 from .funcs import get_password_hash as _hash
 from .funcs import verify_password as _verify
+from .settings import settings
 
 
 class User(BaseModel):
@@ -26,7 +27,7 @@ class User(BaseModel):
     @classmethod
     async def get(cls, username):
         username = username.split(" ")[0]
-        async with aiosqlite.connect(USER_DB) as db:
+        async with aiosqlite.connect(settings.user_db_path) as db:
             async with db.execute(
                 f"SELECT * FROM users WHERE username = '{username}'"
             ) as cursor:
