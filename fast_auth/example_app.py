@@ -1,3 +1,4 @@
+"""
 from fastapi import FastAPI, Depends
 
 from fast_auth import (
@@ -20,3 +21,4 @@ async def root():
 @app.get("/hello/")
 async def say_hello(user: User = Depends(get_current_user)):
     return {"message": f"Hello {user.username}"}
+"""

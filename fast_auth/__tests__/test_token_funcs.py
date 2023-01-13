@@ -4,7 +4,7 @@ from datetime import timedelta
 import pytest
 from jose import ExpiredSignatureError
 
-from auth.funcs import create_access_token, decode_jwt
+from ..funcs import create_access_token, decode_jwt
 
 
 def test_encoded_token_is_decoded():

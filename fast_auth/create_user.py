@@ -1,17 +1,16 @@
 from getpass import getpass
 
-from auth import User
-from auth.funcs import run
+from .user import User
+from .funcs import run
 
 
 async def create_user(username, password):
     await User.create(username=username, password=password)
-    print(f"{username} user created")
 
 
-def run_create_user():
+def run_create_user_with_event_loop():
     run(create_user(input("username: "), getpass("password: ")))
 
 
 if __name__ == "__main__":
-    run_create_user()
+    run_create_user_with_event_loop()

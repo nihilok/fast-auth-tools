@@ -3,16 +3,14 @@ from datetime import timedelta, datetime
 import aiosqlite
 from fastapi import Depends
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 
 from .constants import (
     oauth2_scheme,
+    pwd_context,
 )
 from .settings import settings
 from .token import TokenData
 from .exceptions import credentials_exception
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password):
