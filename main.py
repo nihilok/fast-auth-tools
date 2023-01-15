@@ -1,15 +1,13 @@
 from fastapi import FastAPI, Depends
 
 from fast_auth import (
-    add_auth_routes,
+    fast_auth,
     get_current_user,
     User,
-    set_cors_origins,
 )
 
 app = FastAPI()
-add_auth_routes(app)
-set_cors_origins(app)
+fast_auth(app)
 
 
 @app.get("/", dependencies=[Depends(get_current_user)])

@@ -17,3 +17,8 @@ def set_cors_origins(app: FastAPI):
 
 def add_auth_routes(app: FastAPI):
     app.include_router(router)
+
+
+def fast_auth(app: FastAPI):
+    add_auth_routes(app)
+    set_cors_origins(app)
