@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="fast-auth-tools",
-    version="0.2.0",
+    version="0.2.1",
     url="https://github.com/nihilok/auth_base",
     author="nihilok",
     author_email="",

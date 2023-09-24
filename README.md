@@ -1,6 +1,6 @@
 # Fast Auth Tools (for FastAPI)
 
-> Add authentication to a FastApi app with a single function
+> Adds oauth2 authentication to a FastApi app with a single function
 
 ### Install
 ```shell
