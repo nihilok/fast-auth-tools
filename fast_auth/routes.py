@@ -6,7 +6,7 @@ from .funcs import (
     create_access_token,
 )
 from .settings import settings
-from .user import User, get_current_user
+from .user import User, logged_in_user
 from .token import Token
 
 router = APIRouter()
@@ -28,7 +28,7 @@ async def login_for_access_token(
 
 @router.get(f"/{settings.token_refresh_url}/")
 async def refresh_token(
-    user: User = Depends(get_current_user),
+    user: User = Depends(logged_in_user),
 ):
     access_token = create_access_token(data={"sub": user.username})
     return Token(access_token=access_token, token_type="bearer")

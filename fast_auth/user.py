@@ -66,7 +66,7 @@ class User(BaseModel):
             raise credentials_exception
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def logged_in_user(token: str = Depends(oauth2_scheme)):
     data = await get_data_from_token(token)
     user = await User.get(username=data.username)
     if user is None:

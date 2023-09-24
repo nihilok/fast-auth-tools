@@ -1,12 +1,15 @@
 import sqlite3
+import sys
+from pathlib import Path
+from typing import Optional
 
 from .create_user import run_create_user_with_event_loop
 from .settings import settings
 
 
-def create_user_table():
+def create_user_table(db_path: Optional[Path] = None):
     if __name__ == "__main__":
-        print(f"Creating `users` table in {settings.user_db_path}")
+        print(f"Creating `users` table in {db_path or settings.user_db_path}")
     SQL = """CREATE TABLE IF NOT EXISTS users (
         username text PRIMARY KEY,
         password text NOT NULL
@@ -27,4 +30,8 @@ def create_user_table():
 
 
 if __name__ == "__main__":
-    create_user_table()
+    if len(sys.argv) > 1:
+        path = Path(sys.argv[1])
+    else:
+        path = None
+    create_user_table(path)

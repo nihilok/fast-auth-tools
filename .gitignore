@@ -1,2 +1,3 @@
 .idea/
 fast_auth/__pycache__/
+build/
