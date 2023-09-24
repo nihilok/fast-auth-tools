@@ -31,6 +31,8 @@ auth_settings.cors_origins = ["myapp.com", "my-test-server.com"]
 app = FastAPI()
 fast_auth(app)
 
+
+# Example authenticated routes:
 @app.get("/secure/get/", dependencies=[Depends(logged_in_user)])
 async def must_be_logged_in():
     return {}
