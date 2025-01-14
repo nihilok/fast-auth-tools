@@ -1,8 +1,9 @@
-aiosqlite>=0.18.0
-fastapi>=0.89.0
-pydantic>=1.10.4
+aiosqlite>=0.20.0
+fastapi>=0.115.6
+pydantic>=2.10.5
 passlib>=1.7.4
-starlette>=0.22.0
-bcrypt>=4.0.1
-python-jose>=3.3.0
-python-multipart>=0.0.5
+starlette>=0.41.3
+bcrypt==4.0.1
+PyJWT>=2.6.0
+python-multipart>=0.0.20
+setuptools

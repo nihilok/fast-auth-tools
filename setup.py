@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="fast-auth-tools",
-    version="0.2.1",
+    version="0.2.2",
     url="https://github.com/nihilok/auth_base",
     author="nihilok",
     author_email="",
@@ -16,10 +16,10 @@ setup(
     packages=find_packages(exclude=["main", "fast_auth.__tests__"]),
     install_requires=[
         "fastapi",
-        "python-jose",
         "python-multipart",
         "passlib",
-        "bcrypt",
+        "bcrypt==4.0.1",
         "aiosqlite",
+        "PyJWT",
     ],
 )

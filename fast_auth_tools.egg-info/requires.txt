@@ -1,6 +1,0 @@
-fastapi
-python-jose
-python-multipart
-passlib
-bcrypt
-aiosqlite

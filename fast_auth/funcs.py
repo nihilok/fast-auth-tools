@@ -2,7 +2,9 @@ from datetime import timedelta, datetime
 
 import aiosqlite
 from fastapi import Depends
-from jose import jwt, JWTError
+import jwt
+
+from jwt import PyJWTError
 
 from .constants import (
     oauth2_scheme,
@@ -22,24 +24,20 @@ def verify_password(password, hash):
 
 
 async def replace(table, values: dict, db_path=settings.user_db_path):
-    values = values.items()
-    stmt = f"""
-    REPLACE INTO {table} ({', '.join((v[0] for v in values))})
-    VALUES ({', '.join(("'" + v[1] + "'" for v in values))});
-    """
+    columns = ', '.join(values.keys())
+    placeholders = ', '.join('?' for _ in values)
+    stmt = f"REPLACE INTO {table} ({columns}) VALUES ({placeholders})"
     async with aiosqlite.connect(db_path) as db:
-        await db.execute(stmt)
+        await db.execute(stmt, tuple(values.values()))
         await db.commit()
 
 
 async def insert(table, values: dict, db_path=settings.user_db_path):
-    values = values.items()
-    stmt = f"""
-    INSERT INTO {table} ({', '.join((v[0] for v in values))})
-    VALUES ({', '.join(("'" + v[1] + "'" for v in values))});
-    """
+    columns = ', '.join(values.keys())
+    placeholders = ', '.join('?' for _ in values)
+    stmt = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
     async with aiosqlite.connect(db_path) as db:
-        await db.execute(stmt)
+        await db.execute(stmt, tuple(values.values()))
         await db.commit()
 
 
@@ -72,7 +70,7 @@ async def get_data_from_token(token: str = Depends(oauth2_scheme)) -> TokenData:
         payload = decode_jwt(token)
         token_data = TokenData(username=payload["sub"])
         return token_data
-    except JWTError:
+    except PyJWTError:
         raise credentials_exception
 
 
