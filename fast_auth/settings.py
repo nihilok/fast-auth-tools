@@ -1,5 +1,8 @@
 import os
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Self
+import yaml
 
 DEFAULTS = {
     "cors_origins": ["*"],
@@ -22,5 +25,19 @@ class Settings:
     login_url: str
     token_refresh_url: str
 
+    @classmethod
+    def load_settings(cls, **kwargs) -> Self:
 
-settings = Settings(**DEFAULTS)
+        return cls(**{**DEFAULTS, **kwargs})
+
+
+settings_path = os.getenv("SETTINGS_PATH", "auth.yaml")
+print(settings_path)
+settings_path = Path(settings_path).resolve()
+if settings_path.exists():
+    print("Loading settings from", settings_path)
+    with open(settings_path) as f:
+        settings = Settings.load_settings(**yaml.safe_load(f))
+else:
+    print("No settings file found, using defaults")
+    settings = Settings.load_settings()

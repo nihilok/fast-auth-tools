@@ -24,8 +24,8 @@ def verify_password(password, hash):
 
 
 async def replace(table, values: dict, db_path=settings.user_db_path):
-    columns = ', '.join(values.keys())
-    placeholders = ', '.join('?' for _ in values)
+    columns = ", ".join(values.keys())
+    placeholders = ", ".join("?" for _ in values)
     stmt = f"REPLACE INTO {table} ({columns}) VALUES ({placeholders})"
     async with aiosqlite.connect(db_path) as db:
         await db.execute(stmt, tuple(values.values()))
@@ -33,8 +33,8 @@ async def replace(table, values: dict, db_path=settings.user_db_path):
 
 
 async def insert(table, values: dict, db_path=settings.user_db_path):
-    columns = ', '.join(values.keys())
-    placeholders = ', '.join('?' for _ in values)
+    columns = ", ".join(values.keys())
+    placeholders = ", ".join("?" for _ in values)
     stmt = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
     async with aiosqlite.connect(db_path) as db:
         await db.execute(stmt, tuple(values.values()))
