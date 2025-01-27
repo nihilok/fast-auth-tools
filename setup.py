@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="fast-auth-tools",
-    version="0.2.3",
+    version="0.2.4",
     url="https://github.com/nihilok/auth_base",
     author="nihilok",
     author_email="",
@@ -24,4 +24,9 @@ setup(
         "PyJWT",
         "pyyaml",
     ],
+    entry_points={
+        "console_scripts": [
+            "fast-auth-user=fast_auth.user:main",
+        ],
+    },
 )

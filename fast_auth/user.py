@@ -1,3 +1,6 @@
+import asyncio
+import os
+
 from getpass import getpass
 from typing import Optional
 
@@ -5,6 +8,7 @@ import aiosqlite
 from fastapi import Depends
 from pydantic import BaseModel, constr
 
+from fast_auth.logger import logger
 from .constants import oauth2_scheme
 from .exceptions import (
     DatabaseError,
@@ -41,19 +45,22 @@ class User(BaseModel):
         """
 
     @classmethod
-    async def create_table(cls):
+    async def create_table(cls) -> bool:
         # Check if the table already exists
+        logger.debug(f"Using file {settings.user_db_path}")
         async with aiosqlite.connect(settings.user_db_path) as db:
             async with db.execute(
                 f"SELECT name FROM sqlite_master WHERE type='table' AND name=?;",
                 (cls.__table__,),
             ) as cursor:
                 if await cursor.fetchone():
-                    return
+                    return False  # Table already exists
 
         async with aiosqlite.connect(settings.user_db_path) as db:
             await db.execute(cls.create_table_query())
             await db.commit()
+
+        return True  # Table was created
 
     @classmethod
     async def get(cls, username):
@@ -121,38 +128,48 @@ async def logged_in_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-if __name__ == "__main__":
-    import asyncio
+async def run():
+    if os.path.dirname(str(settings.user_db_path)) == os.path.dirname(__file__):
+        logger.warning(
+            "User database will be created in the site_packages directory! Specify a `user_db_path`  in the config file "
+            "specified by the SETTINGS_PATH environment variable (yaml), or otherwise set the `settings.user_db_path` "
+            "variable."
+        )
 
-    async def run():
-        print(f"Creating `{User.__table__}` table")
-        await User.create_table()
-        print("Table created!")
+    created = await User.create_table()
+    if created:
+        print(f"`{User.__table__}` table created!")
 
-        suggestion = "[Y/n]"
-        check = {"y", "yes", ""}
-        article = "a"
+    suggestion = "[Y/n]"
+    check = {"y", "yes", ""}
+    article = "a"
 
-        while input(f"Create {article} user? {suggestion}: ").strip().lower() in check:
-            username = input("Username: ")
-            password = getpass("Password: ")
-            password_confirm = getpass("Confirm password: ")
-            if password != password_confirm:
-                print("Passwords do not match!")
-                continue
-            try:
-                await User.create(username, password)
-            except FastAuthException as e:
-                print(f"Error creating user: {e}")
-                continue
-            print(f"User `{username}` created!")
+    while input(f"Create {article} user? {suggestion}: ").strip().lower() in check:
+        username = input("Username: ")
+        password = getpass("Password: ")
+        password_confirm = getpass("Confirm password: ")
+        if password != password_confirm:
+            print("Passwords do not match!")
+            continue
+        try:
+            await User.create(username, password)
+        except FastAuthException as e:
+            print(f"Error creating user: {e}")
+            continue
+        print(f"User `{username}` created!")
 
-            suggestion = "[y/N]"
-            check = {"n", "no", ""}
-            article = "another"
+        suggestion = "[y/N]"
+        check = {"y", "yes"}
+        article = "another"
 
+
+def main():
     try:
         asyncio.run(run())
         print("Done!")
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         print("\nExiting...")
+
+
+if __name__ == "__main__":
+    main()

@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Self
 import yaml
 
+from fast_auth.logger import logger
+
 DEFAULTS = {
     "cors_origins": ["*"],
     "secret_key": "SoMeThInG_-sUp3Rs3kREt!!",
@@ -32,12 +34,11 @@ class Settings:
 
 
 settings_path = os.getenv("SETTINGS_PATH", "auth.yaml")
-print(settings_path)
 settings_path = Path(settings_path).resolve()
-if settings_path.exists():
-    print("Loading settings from", settings_path)
+if settings_path.is_file():
+    logger.info("Loading settings from %s" % settings_path)
     with open(settings_path) as f:
         settings = Settings.load_settings(**yaml.safe_load(f))
 else:
-    print("No settings file found, using defaults")
+    logger.info("No settings file found, using default settings...")
     settings = Settings.load_settings()
